@@ -1,7 +1,13 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app import db, app
 from flask_login import UserMixin
+import enum
+
+
+class UserRoleEnum(enum.Enum):
+    USER = 1
+    ADMIN = 2
 
 
 class User(db.Model, UserMixin):
@@ -11,6 +17,7 @@ class User(db.Model, UserMixin):
     password = Column(String(50), nullable=False)
     avatar = Column(String(100),
                     default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg')
+    user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.USER)
 
     def __str__(self):
         return self.name
@@ -45,8 +52,16 @@ if __name__ == '__main__':
         db.create_all()
 
         import hashlib
-        u = User(name='Admin', username='admin', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()))
-        db.session.add(u)
+
+        u = User(name='Admin', username='admin',
+                 password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+                 user_role=UserRoleEnum.ADMIN)
+        u1 = User(name='User', username='user',
+                 password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+                 user_role=UserRoleEnum.USER)
+        # db.session.add(u)
+        # db.session.commit()
+        db.session.add(u1)
         db.session.commit()
 
         # c1 = Category(name='Mobile')
@@ -63,4 +78,3 @@ if __name__ == '__main__':
         # p5 = Product(name='iPhone 15', price=22000000, category_id=1)
         # db.session.add_all([p1, p2, p3, p4, p5])
         # db.session.commit()
-

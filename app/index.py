@@ -1,5 +1,8 @@
-from flask import render_template, request, redirect
+import math
+
+from flask import render_template, request, redirect, jsonify, session
 import dao
+import utils
 from app import app, login
 from flask_login import login_user
 
@@ -13,17 +16,52 @@ def index():
     cates = dao.get_categories()
     prods = dao.get_products(kw, cate_id, page)
 
-    return render_template('index.html', categories=cates, products=prods)
+    num = dao.count_product()
+    page_size = app.config['PAGE_SIZE']
+
+    return render_template('index.html', categories=cates,
+                           products=prods, pages=math.ceil(num / page_size))
 
 
 @app.route('/admin/login', methods=['post'])
 def admin_login():
     username = request.form.get('username')
     password = request.form.get('password')
+
     user = dao.auth_user(username=username, password=password)
     if user:
         login_user(user)
+
     return redirect('/admin')
+
+
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
+
+
+@app.route('/api/cart', methods=['post'])
+def add_to_cart():
+    data = request.json
+    cart = session.get('cart')
+    if cart is None:
+        cart = {}
+
+    id = str(data.get("id"))
+    if id in cart:
+        cart[id]['quantity'] += 1
+    else:
+        cart[id] = {
+            "id": id,
+            "name": data.get('name'),
+            "price": data.get('price'),
+            "quantity": 1
+        }
+
+    session['cart'] = cart
+    print(cart)
+
+    return jsonify(utils.count_cart(cart))
 
 
 @login.user_loader

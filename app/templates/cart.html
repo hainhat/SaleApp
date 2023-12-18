@@ -1,0 +1,32 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Giỏ hàng{% endblock %}
+
+{% block content %}
+<h1 class ="text-center text-info mt-1">Giỏ Hàng</h1>
+
+{% if 'cart' in session %}
+<table class="table">
+    <tr>
+        <th>Mã sản phẩm</th>
+        <th>Tên sản phẩm</th>
+        <th>Số lượng</th>
+        <th>Đơn giá</th>
+        <th></th>
+    </tr>
+    {% for c in session['cart'].values() %}
+    <tr>
+        <td>{{c.id}}</td>
+        <td>{{c.name}}</td>
+        <td>{{c.price}}</td>
+        <td>
+            <input type="number" value="{{c.quantity}}" class="form-control"/>
+        </td>
+        <td>
+            <button class="btn btn-danger">&times;</button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

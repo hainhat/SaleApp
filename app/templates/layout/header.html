@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">BÁN HÀNG TRỰC TUYẾN</a>
+        <a class="navbar-brand" href="/">BÁN HÀNG TRỰC TUYẾN</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -15,8 +15,9 @@
                 </li>
                 {% endfor %}
                 <li class="nav-item">
-                    <a class="nav-link text-danger" href="/cart">&#128722; <span class="badge bg-danger cart-counter">0</span></a>
+                    <a class="nav-link text-danger" href="/cart">&#128722; <span class="badge bg-danger cart-counter">{{ cart_stats.total_quantity }}</span></a>
                 </li>
+
             </ul>
             <form class="d-flex" method="get" action="/">
                 <input class="form-control me-2" type="text" name="kw" placeholder="Nhập từ khóa...">

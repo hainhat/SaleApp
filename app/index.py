@@ -13,13 +13,12 @@ def index():
     cate_id = request.args.get('cate_id')
     page = request.args.get('page')
 
-    cates = dao.get_categories()
     prods = dao.get_products(kw, cate_id, page)
 
     num = dao.count_product()
     page_size = app.config['PAGE_SIZE']
 
-    return render_template('index.html', categories=cates,
+    return render_template('index.html',
                            products=prods, pages=math.ceil(num / page_size))
 
 
@@ -43,14 +42,15 @@ def cart():
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
     data = request.json
+
     cart = session.get('cart')
     if cart is None:
         cart = {}
 
     id = str(data.get("id"))
-    if id in cart:
+    if id in cart:  # da co trong gio
         cart[id]['quantity'] += 1
-    else:
+    else:  # chua co trong gio
         cart[id] = {
             "id": id,
             "name": data.get('name'),
@@ -59,9 +59,51 @@ def add_to_cart():
         }
 
     session['cart'] = cart
-    print(cart)
+    """
+    {
+        "1": {
+            "id": "1",
+            "name": "abc",
+            "price": 123,
+            "quantity": 2
+        }, "2": {
+            "id": "2",
+            "name": "abc",
+            "price": 123,
+            "quantity": 1
+        }
+    }
+    """
 
     return jsonify(utils.count_cart(cart))
+
+
+@app.route('/api/cart/<product_id>', methods=['put'])
+def update_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        quantity = request.json.get('quantity')
+        cart[product_id]['quantity'] = int(quantity)
+    session['cart'] = cart
+    return jsonify(utils.count_cart(cart))
+
+
+@app.route('/api/cart/<product_id>', methods=['delete'])
+def delete_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        del cart[product_id]
+
+    session['cart'] = cart
+    return jsonify(utils.count_cart(cart))
+
+
+@app.context_processor
+def common_responses():
+    return {
+        'categories': dao.get_categories(),
+        'cart_stats': utils.count_cart(session.get('cart'))
+    }
 
 
 @login.user_loader

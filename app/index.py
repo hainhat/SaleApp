@@ -19,7 +19,7 @@ def index():
     page_size = app.config['PAGE_SIZE']
 
     return render_template('index.html',
-                           products=prods, pages=math.ceil(num / page_size))
+                           products=prods, pages=math.ceil(num/page_size))
 
 
 @app.route('/admin/login', methods=['post'])
@@ -48,9 +48,9 @@ def add_to_cart():
         cart = {}
 
     id = str(data.get("id"))
-    if id in cart:  # da co trong gio
+    if id in cart: # da co trong gio
         cart[id]['quantity'] += 1
-    else:  # chua co trong gio
+    else: # chua co trong gio
         cart[id] = {
             "id": id,
             "name": data.get('name'),
@@ -84,6 +84,7 @@ def update_cart(product_id):
     if cart and product_id in cart:
         quantity = request.json.get('quantity')
         cart[product_id]['quantity'] = int(quantity)
+
     session['cart'] = cart
     return jsonify(utils.count_cart(cart))
 
@@ -96,6 +97,31 @@ def delete_cart(product_id):
 
     session['cart'] = cart
     return jsonify(utils.count_cart(cart))
+
+
+@app.route('/login', methods=['get', 'post'])
+def process_user_login():
+    if request.method.__eq__("POST"):
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = dao.auth_user(username=username, password=password)
+        if user:
+            login_user(user)
+
+        next = request.args.get('next')
+        return redirect("/" if next is None else next)
+
+    return render_template('login.html')
+
+
+@app.route("/api/pay", methods=['post'])
+def pay():
+    if dao.add_receipt(session.get('cart')):
+        del session['cart']
+        return jsonify({'status': 200})
+
+    return jsonify({'status': 500, 'err_msg': 'Something wrong!'})
 
 
 @app.context_processor
@@ -113,5 +139,4 @@ def load_user(user_id):
 
 if __name__ == '__main__':
     from app import admin
-
     app.run(debug=True)

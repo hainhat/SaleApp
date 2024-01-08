@@ -52,8 +52,9 @@ class Product(db.Model):
 
 class BaseModel(db.Model):
     __abstract__ = True
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    created_data = Column(DateTime, default=datetime.now())
+    created_date = Column(DateTime, default=datetime.now())
     active = Column(Boolean, default=True)
 
 
@@ -73,26 +74,26 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 
-        # import hashlib
-        #
-        # u = User(name='Admin', username='admin',
-        #          password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #          user_role=UserRoleEnum.ADMIN)
-        # db.session.add(u)
-        # db.session.commit()
-        #
-        # c1 = Category(name='Mobile')
-        # c2 = Category(name='Tablet')
-        # c3 = Category(name='Desktop')
-        # db.session.add(c1)
-        # db.session.add(c2)
-        # db.session.add(c3)
-        # db.session.commit()
-        #
-        # p1 = Product(name='iPhone 13', price=22000000, category_id=1)
-        # p2 = Product(name='Galaxy Tab S9', price=28000000, category_id=2)
-        # p3 = Product(name='iPad Pro 2023', price=21000000, category_id=2)
-        # p4 = Product(name='Galaxy S23', price=18000000, category_id=1)
-        # p5 = Product(name='iPhone 15', price=22000000, category_id=1)
-        # db.session.add_all([p1, p2, p3, p4, p5])
-        # db.session.commit()
+    import hashlib
+
+    u = User(name='Admin', username='admin',
+             password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+             user_role=UserRoleEnum.ADMIN)
+    db.session.add(u)
+    db.session.commit()
+
+    # c1 = Category(name='Mobile')
+    # c2 = Category(name='Tablet')
+    # c3 = Category(name='Desktop')
+    # db.session.add(c1)
+    # db.session.add(c2)
+    # db.session.add(c3)
+    # db.session.commit()
+    #
+    # p1 = Product(name='iPhone 13', price=22000000, category_id=1)
+    # p2 = Product(name='Galaxy Tab S9', price=28000000, category_id=2)
+    # p3 = Product(name='iPad Pro 2023', price=21000000, category_id=2)
+    # p4 = Product(name='Galaxy S23', price=18000000, category_id=1)
+    # p5 = Product(name='iPhone 15', price=22000000, category_id=1)
+    # db.session.add_all([p1, p2, p3, p4, p5])
+    # db.session.commit()
